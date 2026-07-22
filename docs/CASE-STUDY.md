@@ -1,52 +1,29 @@
-# Case Study: Separating Network Reasoning From Network Authority
+# Case study: making network authority explicit
 
-## Context
+## Actual problem
 
-An AI assistant can summarize evidence and propose a change long before it is safe to touch a network. I wanted the architecture to make that gap explicit.
+The private agent spans training, retrieval, runtime schemas, mocked drills, and deployment-adjacent checks. The risk was allowing a partial probe or plausible model answer to imply that mutation was safe.
 
-## Problem
+## Source-backed sequence
 
-A single successful probe can create false confidence. If the assistant jumps from that probe to a configuration change, it skips physical state, topology, transport, collective communication, workload evidence, and rollback readiness.
+1. The RouterOS/Spark corpus and JSON-first scaffold were established.
+2. Fixed gate order was formalized: management, physical link, L2/L3, RDMA, NCCL, workload.
+3. Artifact validation and report semantics were tightened for unknown fields, missing evidence, and stop-on-first-failure.
+4. The v1 restart used 500/100/100 train, validation, and holdout rows.
+5. The archived 24/24 optimization loop and 0.618 versus 0.5328 result remain pre-restart evidence.
+6. V2 used 3,500/350 and a frozen 500-case holdout; the run was rejected and no current adapter is promoted.
 
-## What I built
+## Failed hypotheses
 
-The agent contract has distinct stages:
+- Management reachability alone is enough: false.
+- A mapped link proves RDMA/NCCL/workload readiness: false.
+- A model-generated plan is authority: false.
+- One aggregate score proves safe promotion: false.
 
-1. discover identifies available synthetic capabilities.
-2. retrieve collects evidence without mutation.
-3. gate evaluates the fixed evidence set.
-4. plan produces a proposed change and rollback.
-5. confirm records a human decision.
-6. apply remains unavailable until every dependency is satisfied.
-7. report records evidence, action, verification, and unknowns.
+## Bounded checks and gates
 
-The public example ends before apply. Its target uses a documentation-only name and address.
+Source checks include corpus counts, retrieval refresh/checks, schema/semantic validation, privacy lint, mocked runtime drills, receipt verification, and scope guards. Public acceptance covers only public artifacts; it does not rerun private training.
 
-## Engineering decisions
+## Result
 
-- Gate status is one of pass, fail, or unknown.
-- Freshness is part of evidence quality.
-- A plan cannot silently weaken a failed gate.
-- Confirmation is specific to one plan revision.
-- Rollback and post-change verification are mandatory plan fields.
-- Privacy lint runs before any report can leave the private boundary.
-
-## Representative artifact
-
-The synthetic change plan captures the pipeline, fixed gates, refusal reasons, and confirmation state. It contains no real configuration and no claim of execution.
-
-## Evidence available here
-
-- The JSON plan is syntactically valid.
-- Every fixed evidence gate is represented.
-- The plan remains synthetic and non-applied.
-- The repository checker rejects common private-data patterns.
-- CI repeats the same check.
-
-## Lessons
-
-A useful network assistant should be able to say: the evidence is insufficient, the dependency is unknown, or the rollback is not ready. Those are correct outputs, not failures of usefulness.
-
-## Limitations
-
-The public design does not include vendor configuration, device inventory, actual topology, operational thresholds, or a live control path.
+The project demonstrates an evidence contract and refusal behavior. The v2 rejection is a result, not an omission. No live RouterOS change is claimed.
