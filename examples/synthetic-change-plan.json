@@ -1,0 +1,68 @@
+{
+  "schema_version": "public-example-v1",
+  "synthetic": true,
+  "target": {
+    "hostname": "router-a.example",
+    "address": "203.0.113.20",
+    "role": "representative_network_target"
+  },
+  "pipeline": [
+    "discover",
+    "retrieve",
+    "gate",
+    "plan",
+    "confirm",
+    "apply",
+    "report"
+  ],
+  "evidence_gates": [
+    {
+      "name": "management_reachability",
+      "result": "pass",
+      "freshness": "synthetic_current"
+    },
+    {
+      "name": "physical_link",
+      "result": "unknown",
+      "freshness": "not_collected"
+    },
+    {
+      "name": "l2_l3_topology",
+      "result": "unknown",
+      "freshness": "not_collected"
+    },
+    {
+      "name": "rdma_transport",
+      "result": "unknown",
+      "freshness": "not_collected"
+    },
+    {
+      "name": "nccl",
+      "result": "unknown",
+      "freshness": "not_collected"
+    },
+    {
+      "name": "workload",
+      "result": "unknown",
+      "freshness": "not_collected"
+    }
+  ],
+  "plan": {
+    "state": "blocked",
+    "proposed_effect": "No change; gather missing evidence.",
+    "rollback": "No rollback needed because apply is disabled.",
+    "verification": "Re-evaluate the same fixed gates."
+  },
+  "confirmation": {
+    "state": "unavailable",
+    "apply_allowed": false
+  },
+  "refusal_reasons": [
+    "Dependent evidence gates are unknown.",
+    "No apply authority exists in this public example."
+  ],
+  "privacy_lint": {
+    "state": "pass",
+    "basis": "Synthetic public-safe fields only."
+  }
+}
