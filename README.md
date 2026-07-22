@@ -1,73 +1,46 @@
-# DGX RouterOS Agent Public
+# DGX RouterOS Agent
 
-I built this repository to document an evidence-gated AI assistant pattern for network diagnostics and change planning. The design is JSON-first and deliberately separates discovery, evidence retrieval, gating, planning, confirmation, application, and reporting.
+I built this as a JSON-first record of a RouterOS-focused agent that separates network reasoning from network authority. The private source baseline is ab614b1 and contains corpus, schemas, runtime code, reports, and training/evaluation receipts.
 
 ## What I built
 
-The public design centers on a strict pipeline:
+1. Topology-first discovery that does not assume cabling, switch model, hostnames, or node count.
+2. Retrieval over source-grounded RouterOS, MikroTik, DGX Spark, NVIDIA, and clean-lab context.
+3. Fixed gates: management reachability, physical link, L2/L3 topology, RDMA transport, NCCL, workload.
+4. JSON-first topology, gate, plan, apply-receipt, and report artifacts.
+5. `confirm_to_apply` authority with rollback and source references; execute remains fail-closed for operator-review plans.
+6. Privacy linting, sanitized source paths, and holdout/evaluation records.
 
-discover -> retrieve -> gate -> plan -> confirm -> apply -> report
+## Recorded results
 
-The agent does not earn write authority by producing a plausible plan. It must satisfy fixed evidence gates, present rollback, and receive explicit confirmation before any apply stage can exist.
+| Observation | Source evidence | Status |
+|---|---|---|
+| Baseline ab614b1 | private HEAD | Historical |
+| Spark-agent v1: 500 train, 100 validation, 100 holdout rows | source README/manifests | Historical |
+| Archived loop: 24/24 iterations | source README/receipt verifier | Archived |
+| Archived selected score: 0.618 versus base 0.5328 | source README | Historical, not current |
+| Spark-agent v2: 3,500 train, 350 validation, frozen 500-case holdout; rejected | source README | Historical decision |
+| Contact audit: 193 receipts to training target; no Spark SSH/deploy/doctor contact | source README | Historical audit |
 
 ## Why it matters
 
-Network automation fails dangerously when it confuses a partial observation with the whole system. A reachable management endpoint does not prove the physical path. A visible link does not prove transport behavior. A workload result does not explain why the lower layers are healthy.
-
-I designed the agent to preserve those distinctions.
+A reachable management endpoint does not prove physical link, transport, collective communication, or workload health. Fixed ordering makes the first failed dependency visible.
 
 ## Engineering approach
 
-The fixed evidence gates are:
+Schemas and semantic contracts are checked before artifacts are accepted. Plans require intended changes, rollback, source references, and a confirmation token. Reports retain source hashes and gate order.
 
-- management_reachability
-- physical_link
-- l2_l3_topology
-- rdma_transport
-- nccl
-- workload
+## Sanitized architecture boundary
 
-Each gate records evidence, freshness, result, and reason. A failed or unknown gate blocks dependent actions. Plans include expected effect, rollback, verification, and a confirmation token that is not reusable.
-
-A privacy lint runs before reports are considered publishable.
-
-## Synthetic public-safe architecture
-
-The architecture shows the evidence pipeline with fictional endpoints and documentation-only addresses.
-
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
-
-## Representative work and artifacts
-
-- [Case study](docs/CASE-STUDY.md) - why confirm-to-apply and fixed gates matter.
-- [Synthetic change plan](examples/synthetic-change-plan.json) - a JSON-first plan with all required gates.
-- [Publication safety](docs/PUBLICATION-SAFETY.md) - privacy and reporting rules.
-- [Share copy](docs/SHARE.md) - concise public explanation.
-- [Safety checker](scripts/check_publication_safety.py) - repository privacy gate.
-
-## Evidence and lessons
-
-The public evidence is the contract itself: structured gates, explicit refusal logic, rollback fields, synthetic endpoints, JSON validation, and CI privacy checks. The example is not a live change record.
-
-The key lesson is that planning and applying are different capabilities. The assistant can be useful while remaining unable to act.
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). It preserves discovery -> retrieve -> gate -> plan -> confirm -> report without live topology, ports, endpoints, or credentials.
 
 ## Repository map
 
-| Path | Purpose |
-|---|---|
-| README.md | Agent contract and limits |
-| docs/CASE-STUDY.md | Design rationale |
-| docs/ARCHITECTURE.md | Synthetic Mermaid pipeline |
-| docs/PUBLICATION-SAFETY.md | Public reporting boundary |
-| docs/SHARE.md | Share-ready copy |
-| examples/ | Synthetic JSON plan |
-| scripts/check_publication_safety.py | Privacy and structure checker |
-| .github/workflows/publication-safety.yml | CI gate |
+- [docs/CASE-STUDY.md](docs/CASE-STUDY.md)
+- [docs/AGENT-EVALUATION-RECORD.md](docs/AGENT-EVALUATION-RECORD.md)
+- [docs/PUBLICATION-SAFETY.md](docs/PUBLICATION-SAFETY.md)
+- [examples/synthetic-change-plan.json](examples/synthetic-change-plan.json)
 
-## Publication boundary
+## Evidence rules and limits
 
-This is a public project interface, not an operational deployment repository. I publish no live addresses, hostnames, hardware identities, account details, local paths, credentials, raw telemetry, service inventories, private topology, equipment maps, controller identities, or commands targeting real systems. Examples are synthetic and do not reproduce a live environment.
-
-## Limitations
-
-This repository documents a safety architecture, not a deployed agent. It does not claim successful changes, live network access, product endorsement, or operational readiness.
+These are historical source-backed readings, not live status. This is a public project interface, not an operational repository. It publishes no adapters, private inventories, raw corpora, runtime endpoints, or deployment claims.
