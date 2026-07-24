@@ -44,3 +44,8 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). It preserves discovery -> retr
 ## Evidence rules and limits
 
 These are historical source-backed readings, not live status. This is a public project interface, not an operational repository. It publishes no adapters, private inventories, raw corpora, runtime endpoints, or deployment claims.
+
+## Copyright
+
+Copyright (c) 2026 Gumbii Digital. All rights reserved. See
+[COPYRIGHT.md](COPYRIGHT.md) for the publication and reuse terms.
